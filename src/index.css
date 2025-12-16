@@ -143,3 +143,27 @@ body {
     align-items: stretch;
   }
 }
+
+/* Light-green button utility to make primary actions consistent */
+.btn-green {
+  background-color: #bff3d0 !important;
+  color: #064e3b !important;
+  border-color: #8de3a8 !important;
+}
+.btn-green:hover {
+  background-color: #aeeec1 !important;
+}
+.btn-green:active {
+  background-color: #96e6ad !important;
+}
+.btn-green.dark {
+  /* fallback in case button itself gets .dark; keep for safety */
+  background-color: #164e2e !important;
+  color: #d7fbe7 !important;
+  border-color: #0f3b24 !important;
+}
+:root.dark .btn-green {
+  background-color: #164e2e !important;
+  color: #d7fbe7 !important;
+  border-color: #0f3b24 !important;
+}

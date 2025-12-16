@@ -6,6 +6,7 @@ import peanut2 from './assets/peanut2.jpeg'
 import mace1 from './assets/mace.jpeg'
 import mitmita from './assets/mitmita.jpeg'
 import berbere from './assets/berbere.jpeg'
+import admasLogo from './assets/admastrading.jpg'
 
 // Animated counter component
 function AnimatedCounter({ target, duration = 2000 }: { target: number; duration?: number }) {
@@ -261,7 +262,7 @@ function App() {
           <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-4 responsive-padding">
             <div className="flex items-center gap-3">
               <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-gradient-to-br from-amber-500 to-amber-300 text-slate-950 font-semibold shadow-lg shadow-amber-500/30">
-                AT
+                <img src={admasLogo} alt="Admas Trading" className="h-full w-full object-cover rounded-2xl" />
               </div>
               <div>
                 <p className="text-lg font-semibold tracking-tight">Admas Trading</p>
@@ -272,19 +273,19 @@ function App() {
             </div>
 
             <div className="flex items-center gap-3">
-              <button
-                type="button"
-                aria-label="Toggle dark mode"
-                onClick={() => setIsDark((prev) => !prev)}
-                className={`flex h-10 w-10 items-center justify-center rounded-full border bg-white text-slate-900 shadow-sm transition hover:-translate-y-0.5 hover:border-amber-300 hover:text-amber-700 ${
+                  <button
+                    type="button"
+                    aria-label="Toggle dark mode"
+                    onClick={() => setIsDark((prev) => !prev)}
+                    className={`btn-green flex h-10 w-10 items-center justify-center rounded-full border bg-white text-slate-900 shadow-sm transition hover:-translate-y-0.5 hover:border-amber-300 hover:text-amber-700 ${
                   isDark ? 'border-slate-700 bg-slate-800 text-amber-100' : 'border-slate-200'
                 }`}
               >
                 {isDark ? '🌞' : '🌓'}
               </button>
               <a
-                href="/"
-                className={`rounded-full border px-4 py-2 text-sm font-semibold transition hover:-translate-y-0.5 hover:border-amber-300 ${
+                    href="/"
+                    className={`btn-green rounded-full border px-4 py-2 text-sm font-semibold transition hover:-translate-y-0.5 hover:border-amber-300 ${
                   isDark ? 'border-slate-700 text-slate-100 hover:text-amber-200' : 'border-slate-200 text-slate-900 hover:text-amber-700'
                 }`}
               >
@@ -329,7 +330,7 @@ function App() {
         <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-4 responsive-padding">
           <div className="flex items-center gap-3">
             <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-gradient-to-br from-amber-500 to-amber-300 text-slate-950 font-semibold shadow-lg shadow-amber-500/30">
-              AT
+              <img src={admasLogo} alt="Admas Trading" className="h-full w-full object-cover rounded-2xl" />
             </div>
       <div>
               <p className="text-lg font-semibold tracking-tight">Admas Trading</p>
@@ -341,16 +342,16 @@ function App() {
 
           <nav className="flex items-center gap-3">
             <a
-              href="#products-overview"
-              className={`rounded-full border px-3 py-2 text-sm font-semibold transition hover:-translate-y-0.5 hover:border-amber-300 ${
+                href="#products-overview"
+                className={`btn-green rounded-full border px-3 py-2 text-sm font-semibold transition hover:-translate-y-0.5 hover:border-amber-300 ${
                 isDark ? 'border-slate-700 text-slate-100 hover:text-amber-200' : 'border-slate-200 text-slate-900 hover:text-amber-600'
               }`}
             >
               Products
             </a>
             <a
-              href="#services"
-              className={`rounded-full border px-3 py-2 text-sm font-semibold transition hover:-translate-y-0.5 hover:border-amber-300 ${
+                href="#services"
+                className={`btn-green rounded-full border px-3 py-2 text-sm font-semibold transition hover:-translate-y-0.5 hover:border-amber-300 ${
                 isDark ? 'border-slate-700 text-slate-100 hover:text-amber-200' : 'border-slate-200 text-slate-900 hover:text-amber-600'
               }`}
             >
@@ -362,8 +363,8 @@ function App() {
             <button
               type="button"
               aria-label="Toggle dark mode"
-              onClick={() => setIsDark((prev) => !prev)}
-              className={`flex h-10 w-10 items-center justify-center rounded-full border bg-white text-slate-900 shadow-sm transition hover:-translate-y-0.5 hover:border-amber-300 hover:text-amber-700 ${
+                onClick={() => setIsDark((prev) => !prev)}
+                className={`btn-green flex h-10 w-10 items-center justify-center rounded-full border bg-white text-slate-900 shadow-sm transition hover:-translate-y-0.5 hover:border-amber-300 hover:text-amber-700 ${
                 isDark ? 'border-slate-700 bg-slate-800 text-amber-100' : 'border-slate-200'
               }`}
             >
@@ -596,8 +597,8 @@ function App() {
 
           <div className="flex justify-center">
             <a
-              href="/products"
-              className="rounded-full border border-amber-300/60 bg-amber-400/90 px-5 py-3 text-sm font-semibold text-slate-950 shadow-lg shadow-amber-500/30 transition hover:-translate-y-0.5 hover:bg-amber-300"
+                href="/products"
+                className="btn-green rounded-full border border-amber-300/60 bg-amber-400/90 px-5 py-3 text-sm font-semibold text-slate-950 shadow-lg shadow-amber-500/30 transition hover:-translate-y-0.5 hover:bg-amber-300"
             >
               Show all products
             </a>
@@ -737,7 +738,7 @@ function App() {
             <div className="flex flex-wrap gap-3">
               <a
                 href="mailto:export@admastrading.com"
-                className={`rounded-lg px-5 py-3 text-sm font-semibold shadow-lg transition hover:-translate-y-0.5 hover:text-white ${
+                className={`btn-green rounded-lg px-5 py-3 text-sm font-semibold shadow-lg transition hover:-translate-y-0.5 hover:text-white ${
                   isDark ? 'bg-slate-800 text-amber-200 shadow-slate-900/50' : 'bg-slate-900 text-amber-200 shadow-amber-500/30'
                 }`}
               >
@@ -747,7 +748,7 @@ function App() {
                 href="https://www.google.com/maps/place/Addis+Ababa,+Ethiopia"
                 target="_blank"
                 rel="noreferrer"
-                className={`rounded-lg border px-5 py-3 text-sm font-semibold transition hover:-translate-y-0.5 ${
+                className={`btn-green rounded-lg border px-5 py-3 text-sm font-semibold transition hover:-translate-y-0.5 ${
                   isDark
                     ? 'border-slate-700 text-slate-100 hover:border-amber-300'
                     : 'border-slate-300 text-slate-900 hover:border-slate-900'

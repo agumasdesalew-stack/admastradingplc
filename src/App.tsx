@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState, useRef } from 'react'
 import injera1 from './assets/injera1.jpeg'
 import injera2 from './assets/injera2.jpeg'
 import ginger1 from './assets/ginger1.jpeg'
@@ -6,6 +6,56 @@ import peanut2 from './assets/peanut2.jpeg'
 import mace1 from './assets/mace.jpeg'
 import mitmita from './assets/mitmita.jpeg'
 import berbere from './assets/berbere.jpeg'
+
+// Animated counter component
+function AnimatedCounter({ target, duration = 2000 }: { target: number; duration?: number }) {
+  const [count, setCount] = useState(0)
+  const hasAnimated = useRef(false)
+  const counterRef = useRef<HTMLSpanElement>(null)
+
+  useEffect(() => {
+    if (hasAnimated.current) return
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting && !hasAnimated.current) {
+          hasAnimated.current = true
+          const startTime = Date.now()
+          const startValue = 0
+
+          const animate = () => {
+            const now = Date.now()
+            const elapsed = now - startTime
+            const progress = Math.min(elapsed / duration, 1)
+            const easeOutQuart = 1 - Math.pow(1 - progress, 4)
+            const current = Math.floor(startValue + (target - startValue) * easeOutQuart)
+
+            setCount(current)
+
+            if (progress < 1) {
+              requestAnimationFrame(animate)
+            } else {
+              setCount(target)
+            }
+          }
+
+          requestAnimationFrame(animate)
+        }
+      },
+      { threshold: 0.3 }
+    )
+
+    if (counterRef.current) {
+      observer.observe(counterRef.current)
+    }
+
+    return () => {
+      if (counterRef.current) observer.unobserve(counterRef.current)
+    }
+  }, [target, duration])
+
+  return <span ref={counterRef}>{count.toLocaleString()}+</span>
+}
 
 const heroGallery = [
   { src: injera1, alt: 'Fresh Ethiopian Injera ready for export' },
@@ -111,6 +161,7 @@ const overviewProducts = products.slice(0, 3)
 
 function App() {
   const [isDark, setIsDark] = useState(false)
+  const [route, setRoute] = useState(() => window.location.pathname)
 
   useEffect(() => {
     const root = document.documentElement
@@ -122,6 +173,145 @@ function App() {
       body.classList.remove('dark-body')
     }
   }, [isDark])
+
+  useEffect(() => {
+    const handler = () => setRoute(window.location.pathname)
+    window.addEventListener('popstate', handler)
+    return () => window.removeEventListener('popstate', handler)
+  }, [])
+
+  useEffect(() => {
+    document.title = route.startsWith('/products') ? 'Admas Trading | Products' : 'Admas Trading | Home'
+  }, [route])
+
+  const fullProductsGrid = useMemo(
+    () => (
+      <div className="grid gap-6 md:grid-cols-3">
+        {products.map((product, idx) => (
+          <div
+            key={`all-${product.name}`}
+            className={`surface group relative overflow-hidden rounded-2xl border shadow-lg transition-all duration-500 ease-out hover:scale-105 hover:-translate-y-2 hover:shadow-2xl animate-slide-up ${
+              isDark
+                ? 'border-slate-800 bg-slate-900 shadow-amber-500/20 hover:shadow-amber-500/40'
+                : 'border-slate-200 bg-white shadow-amber-300/40 hover:shadow-amber-400/60'
+            }`}
+            style={{ animationDelay: `${idx * 100}ms` }}
+          >
+            <div className="relative h-44 overflow-hidden">
+              <div className="absolute inset-0 bg-gradient-to-t from-black/25 via-transparent to-transparent opacity-90 transition-opacity duration-300 group-hover:opacity-100" />
+              <img
+                src={product.image}
+                alt={product.name}
+                className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110"
+              />
+              <div className="absolute left-3 top-3 flex gap-2">
+                <span className="rounded-full bg-amber-400/80 px-3 py-1 text-[11px] font-semibold text-slate-950 shadow">
+                  {product.badge}
+                </span>
+                <span className="rounded-full border border-white/60 bg-black/70 px-3 py-1 text-[11px] font-semibold text-amber-50">
+                  {product.price}
+                </span>
+              </div>
+              <p className="absolute bottom-3 left-3 text-sm font-semibold text-white drop-shadow">
+                {product.name}
+              </p>
+            </div>
+
+            <div className="space-y-3 px-5 py-4">
+              <p className={`text-sm ${isDark ? 'text-slate-200/85' : 'text-slate-700'}`}>{product.note}</p>
+              <div
+                className={`space-y-2 rounded-xl border p-3 text-xs ${
+                  isDark ? 'border-slate-800 bg-slate-900 text-slate-200/85' : 'border-slate-200 bg-slate-50 text-slate-700'
+                }`}
+              >
+                <div>
+                  <span className={`font-semibold ${isDark ? 'text-amber-200' : 'text-amber-700'}`}>Ingredients: </span>
+                  {product.ingredients}
+                </div>
+                <div>
+                  <span className={`font-semibold ${isDark ? 'text-amber-200' : 'text-amber-700'}`}>Shelf life: </span>
+                  {product.expiry}
+                </div>
+                <div>
+                  <span className={`font-semibold ${isDark ? 'text-amber-200' : 'text-amber-700'}`}>Details: </span>
+                  {product.description}
+                </div>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+    ),
+    [isDark],
+  )
+
+  if (route.startsWith('/products')) {
+    return (
+      <div
+        className={`min-h-screen ${isDark ? 'bg-slate-950 text-slate-100' : 'bg-white text-slate-900'}`}
+      >
+        <div
+          className={`absolute inset-0 pointer-events-none ${isDark ? 'bg-gradient-to-br from-slate-900/60 via-slate-800/40 to-slate-900/30' : 'bg-gradient-to-br from-amber-200/40 via-cyan-100/25 to-indigo-100/25'}`}
+        />
+        <header
+          className={`relative border-b backdrop-blur shadow-sm ${
+            isDark ? 'border-slate-800 bg-slate-900/80' : 'border-slate-200 bg-white/80'
+          }`}
+        >
+          <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-4 responsive-padding">
+            <div className="flex items-center gap-3">
+              <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-gradient-to-br from-amber-500 to-amber-300 text-slate-950 font-semibold shadow-lg shadow-amber-500/30">
+                AT
+              </div>
+              <div>
+                <p className="text-lg font-semibold tracking-tight">Admas Trading</p>
+                <p className={`text-sm ${isDark ? 'text-slate-200/80' : 'text-slate-500'}`}>
+                  Exporting Ethiopian excellence
+                </p>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-3">
+              <button
+                type="button"
+                aria-label="Toggle dark mode"
+                onClick={() => setIsDark((prev) => !prev)}
+                className={`flex h-10 w-10 items-center justify-center rounded-full border bg-white text-slate-900 shadow-sm transition hover:-translate-y-0.5 hover:border-amber-300 hover:text-amber-700 ${
+                  isDark ? 'border-slate-700 bg-slate-800 text-amber-100' : 'border-slate-200'
+                }`}
+              >
+                {isDark ? '🌞' : '🌓'}
+              </button>
+              <a
+                href="/"
+                className={`rounded-full border px-4 py-2 text-sm font-semibold transition hover:-translate-y-0.5 hover:border-amber-300 ${
+                  isDark ? 'border-slate-700 text-slate-100 hover:text-amber-200' : 'border-slate-200 text-slate-900 hover:text-amber-700'
+                }`}
+              >
+                Back to home
+              </a>
+            </div>
+          </div>
+        </header>
+
+        <main className="relative mx-auto max-w-6xl px-4 pb-16 pt-10 space-y-10 responsive-padding">
+          <div className="flex items-center justify-between gap-4 flex-wrap">
+            <div>
+              <p className="text-xs uppercase tracking-[0.2em] text-amber-200">Products</p>
+              <h1 className={`mt-2 text-3xl font-semibold ${isDark ? 'text-slate-50' : 'text-slate-900'}`}>
+                All products
+              </h1>
+            </div>
+            <p className={`text-sm max-w-xl ${isDark ? 'text-slate-300' : 'text-slate-600'}`}>
+              Full export catalog with ingredients, shelf life, and detailed notes for each item.
+            </p>
+          </div>
+
+          {fullProductsGrid}
+        </main>
+      </div>
+    )
+  }
 
   return (
     <div
@@ -141,7 +331,7 @@ function App() {
             <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-gradient-to-br from-amber-500 to-amber-300 text-slate-950 font-semibold shadow-lg shadow-amber-500/30">
               AT
             </div>
-            <div>
+      <div>
               <p className="text-lg font-semibold tracking-tight">Admas Trading</p>
               <p className={`text-sm ${isDark ? 'text-slate-200/80' : 'text-slate-500'}`}>
                 Exporting Ethiopian excellence
@@ -151,7 +341,7 @@ function App() {
 
           <nav className="flex items-center gap-3">
             <a
-              href="#products"
+              href="#products-overview"
               className={`rounded-full border px-3 py-2 text-sm font-semibold transition hover:-translate-y-0.5 hover:border-amber-300 ${
                 isDark ? 'border-slate-700 text-slate-100 hover:text-amber-200' : 'border-slate-200 text-slate-900 hover:text-amber-600'
               }`}
@@ -193,7 +383,7 @@ function App() {
         <section className="grid gap-10 lg:grid-cols-[1.1fr_0.9fr] items-center">
           <div className="space-y-6">
             <div
-              className={`inline-flex items-center gap-2 rounded-full border px-3 py-1 text-xs ${
+              className={`inline-flex items-center gap-2 rounded-full border px-3 py-1 text-xs animate-slide-in-left ${
                 isDark
                   ? 'border-amber-300/40 bg-amber-200/20 text-amber-100'
                   : 'border-amber-200 bg-amber-50 text-amber-700'
@@ -202,13 +392,17 @@ function App() {
               Ethiopian Injera • House spices • Global export
             </div>
             <h1
-              className={`text-4xl font-semibold leading-tight sm:text-5xl ${
+              className={`text-4xl font-semibold leading-tight sm:text-5xl animate-slide-in-left ${
                 isDark ? 'text-slate-50' : 'text-slate-900'
               }`}
+              style={{ animationDelay: '100ms' }}
             >
               Fresh Injera and house-made spices, delivered reliably to your market.
             </h1>
-            <p className={`text-lg ${isDark ? 'text-slate-200/90' : 'text-slate-700'}`}>
+            <p
+              className={`text-lg animate-slide-in-left ${isDark ? 'text-slate-200/90' : 'text-slate-700'}`}
+              style={{ animationDelay: '200ms' }}
+            >
               Admas Trading sources teff and spice inputs directly from trusted Ethiopian farms,
               crafts authentic products in-house, and manages compliant export logistics so you can
               stock shelves or supply kitchens with confidence.
@@ -232,12 +426,13 @@ function App() {
               </a>
             </div>
             <div className="grid gap-3 sm:grid-cols-3">
-              {highlights.map((item) => (
+              {highlights.map((item, idx) => (
                 <div
                   key={item.title}
-                  className={`surface rounded-2xl border p-4 shadow-lg shadow-amber-100/60 ${
+                  className={`surface rounded-2xl border p-4 golden-shadow animate-slide-up ${
                     isDark ? 'border-slate-800 bg-slate-900' : 'border-slate-200 bg-white'
                   }`}
+                  style={{ animationDelay: `${idx * 100}ms` }}
                 >
                   <p className={`text-sm font-semibold ${isDark ? 'text-amber-200' : 'text-amber-700'}`}>
                     {item.title}
@@ -252,12 +447,13 @@ function App() {
 
           <div className="relative space-y-6">
             <div className="grid gap-4 sm:grid-cols-2 hero-grid">
-              {heroGallery.map((image) => (
+              {heroGallery.map((image, idx) => (
                 <div
                   key={image.alt}
-                  className={`surface relative overflow-hidden rounded-[18px] border shadow-xl ${
-                    isDark ? 'border-slate-800 bg-slate-900 shadow-slate-900/40' : 'border-slate-200 bg-white shadow-amber-100/70'
+                  className={`surface relative overflow-hidden rounded-[18px] border shadow-xl golden-shadow animate-slide-in-right transition-all duration-300 hover:scale-105 hover:shadow-2xl ${
+                    isDark ? 'border-slate-800 bg-slate-900' : 'border-slate-200 bg-white'
                   }`}
+                  style={{ animationDelay: `${idx * 150}ms` }}
                 >
                   <div className="absolute inset-0 bg-gradient-to-t from-black/25 via-transparent to-transparent" />
                   <img src={image.src} alt={image.alt} className="h-64 w-full object-cover" />
@@ -269,9 +465,10 @@ function App() {
             </div>
 
             <div
-              className={`surface relative overflow-hidden rounded-[24px] border shadow-2xl ${
-                isDark ? 'border-slate-800 bg-slate-900 shadow-slate-900/40' : 'border-slate-200 bg-white shadow-amber-100/70'
+              className={`surface relative overflow-hidden rounded-[24px] border shadow-2xl golden-shadow-lg animate-slide-in-right ${
+                isDark ? 'border-slate-800 bg-slate-900' : 'border-slate-200 bg-white'
               }`}
+              style={{ animationDelay: '200ms' }}
             >
               <div
                 className={`flex items-center justify-between border-b px-5 py-4 ${
@@ -293,7 +490,9 @@ function App() {
                 <div className="flex items-center justify-between">
                   <div>
                     <p className={`text-sm ${isDark ? 'text-slate-300' : 'text-slate-500'}`}>Weekly capacity</p>
-                    <p className={`text-2xl font-semibold ${isDark ? 'text-slate-50' : 'text-slate-900'}`}>18,000+ packs</p>
+                    <p className={`text-2xl font-semibold ${isDark ? 'text-slate-50' : 'text-slate-900'}`}>
+                      <AnimatedCounter target={18000} /> packs
+                    </p>
                   </div>
                   <div
                     className={`rounded-xl px-4 py-2 text-sm font-semibold ${
@@ -328,26 +527,35 @@ function App() {
         </section>
 
         <section id="products-overview" className="space-y-6 scroll-mt-24">
-          <div className="flex items-center justify-between gap-4 flex-wrap">
+          <div className="flex items-center justify-between gap-4 flex-wrap animate-slide-in-left">
             <div>
               <p className="text-xs uppercase tracking-[0.2em] text-amber-200">Products</p>
-              <h2 className="mt-2 text-2xl font-semibold text-slate-900">Overview (top 3)</h2>
+              <h2 className={`mt-2 text-2xl font-semibold ${isDark ? 'text-slate-50' : 'text-slate-900'}`}>
+                Overview (top 3)
+              </h2>
             </div>
             <p className={`text-sm max-w-xl ${isDark ? 'text-slate-300' : 'text-slate-600'}`}>
               Snapshot of our leading lines. Explore all products for full details and options.
             </p>
           </div>
           <div className="grid gap-6 md:grid-cols-3">
-            {overviewProducts.map((product) => (
+            {overviewProducts.map((product, idx) => (
               <div
                 key={product.name}
-                className={`surface group relative overflow-hidden rounded-2xl border shadow-lg ${
-                  isDark ? 'border-slate-800 bg-slate-900 shadow-slate-900/40' : 'border-slate-200 bg-white shadow-amber-100/60'
+                className={`surface group relative overflow-hidden rounded-2xl border shadow-lg transition-all duration-500 ease-out hover:scale-105 hover:-translate-y-2 hover:shadow-2xl ${
+                  isDark
+                    ? 'border-slate-800 bg-slate-900 shadow-amber-500/20 hover:shadow-amber-500/40'
+                    : 'border-slate-200 bg-white shadow-amber-300/40 hover:shadow-amber-400/60'
                 }`}
+                style={{ animationDelay: `${idx * 100}ms` }}
               >
                 <div className="relative h-44 overflow-hidden">
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/25 via-transparent to-transparent opacity-90 transition group-hover:opacity-100" />
-                  <img src={product.image} alt={product.name} className="h-full w-full object-cover" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/25 via-transparent to-transparent opacity-90 transition-opacity duration-300 group-hover:opacity-100" />
+                  <img
+                    src={product.image}
+                    alt={product.name}
+                    className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110"
+                  />
                   <div className="absolute left-3 top-3 flex gap-2">
                     <span className="rounded-full bg-amber-400/80 px-3 py-1 text-[11px] font-semibold text-slate-950 shadow">
                       {product.badge}
@@ -388,71 +596,11 @@ function App() {
 
           <div className="flex justify-center">
             <a
-              href="#products"
+              href="/products"
               className="rounded-full border border-amber-300/60 bg-amber-400/90 px-5 py-3 text-sm font-semibold text-slate-950 shadow-lg shadow-amber-500/30 transition hover:-translate-y-0.5 hover:bg-amber-300"
             >
               Show all products
             </a>
-          </div>
-        </section>
-
-        <section id="products" className="space-y-6 scroll-mt-24">
-          <div className="flex items-center justify-between gap-4 flex-wrap">
-            <div>
-              <p className="text-xs uppercase tracking-[0.2em] text-amber-200">Products</p>
-              <h2 className="mt-2 text-2xl font-semibold text-slate-900">All products</h2>
-            </div>
-            <p className={`text-sm max-w-xl ${isDark ? 'text-slate-300' : 'text-slate-600'}`}>
-              Full export catalog with ingredients, shelf life, and detailed notes for each item.
-            </p>
-          </div>
-          <div className="grid gap-6 md:grid-cols-3">
-            {products.map((product) => (
-              <div
-                key={`all-${product.name}`}
-                className={`surface group relative overflow-hidden rounded-2xl border shadow-lg ${
-                  isDark ? 'border-slate-800 bg-slate-900 shadow-slate-900/40' : 'border-slate-200 bg-white shadow-amber-100/60'
-                }`}
-              >
-                <div className="relative h-44 overflow-hidden">
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/25 via-transparent to-transparent opacity-90 transition group-hover:opacity-100" />
-                  <img src={product.image} alt={product.name} className="h-full w-full object-cover" />
-                  <div className="absolute left-3 top-3 flex gap-2">
-                    <span className="rounded-full bg-amber-400/80 px-3 py-1 text-[11px] font-semibold text-slate-950 shadow">
-                      {product.badge}
-                    </span>
-                    <span className="rounded-full border border-white/60 bg-black/70 px-3 py-1 text-[11px] font-semibold text-amber-50">
-                      {product.price}
-                    </span>
-                  </div>
-                  <p className="absolute bottom-3 left-3 text-sm font-semibold text-white drop-shadow">
-                    {product.name}
-                  </p>
-                </div>
-
-                <div className="space-y-3 px-5 py-4">
-                  <p className={`text-sm ${isDark ? 'text-slate-200/85' : 'text-slate-700'}`}>{product.note}</p>
-                  <div
-                    className={`space-y-2 rounded-xl border p-3 text-xs ${
-                      isDark ? 'border-slate-800 bg-slate-900 text-slate-200/85' : 'border-slate-200 bg-slate-50 text-slate-700'
-                    }`}
-                  >
-                    <div>
-                      <span className={`font-semibold ${isDark ? 'text-amber-200' : 'text-amber-700'}`}>Ingredients: </span>
-                      {product.ingredients}
-                    </div>
-                    <div>
-                      <span className={`font-semibold ${isDark ? 'text-amber-200' : 'text-amber-700'}`}>Shelf life: </span>
-                      {product.expiry}
-                    </div>
-                    <div>
-                      <span className={`font-semibold ${isDark ? 'text-amber-200' : 'text-amber-700'}`}>Details: </span>
-                      {product.description}
-                    </div>
-                  </div>
-                </div>
-              </div>
-            ))}
           </div>
         </section>
 
@@ -464,15 +612,16 @@ function App() {
             </div>
             <p className={`text-sm max-w-xl ${isDark ? 'text-slate-300' : 'text-slate-600'}`}>
               Export support from paperwork to packaging, tailored to your route, volume, and brand needs.
-            </p>
-          </div>
+        </p>
+      </div>
           <div className="grid gap-4 md:grid-cols-2">
-            {services.map((service) => (
+            {services.map((service, idx) => (
               <div
                 key={service.title}
-                className={`surface rounded-2xl border p-5 shadow-lg ${
-                  isDark ? 'border-slate-800 bg-slate-900 shadow-slate-900/40' : 'border-slate-200 bg-white shadow-amber-100/50'
+                className={`surface rounded-2xl border p-5 golden-shadow animate-slide-up transition-all duration-300 hover:scale-105 hover:-translate-y-1 ${
+                  isDark ? 'border-slate-800 bg-slate-900' : 'border-slate-200 bg-white'
                 }`}
+                style={{ animationDelay: `${idx * 100}ms` }}
               >
                 <p className={`text-sm font-semibold ${isDark ? 'text-amber-200' : 'text-amber-700'}`}>
                   {service.title}
@@ -484,10 +633,17 @@ function App() {
         </section>
 
         <section className="grid gap-6 lg:grid-cols-[1fr_1.1fr] items-start">
-          <div className="surface rounded-2xl border border-slate-200 bg-white p-6 shadow-lg shadow-amber-100/50">
+          <div
+            className={`surface rounded-2xl border p-6 golden-shadow-lg animate-slide-in-left ${
+              isDark ? 'border-slate-800 bg-slate-900' : 'border-slate-200 bg-white'
+            }`}
+            style={{ animationDelay: '100ms' }}
+          >
             <p className="text-xs uppercase tracking-[0.2em] text-amber-200">Logistics</p>
-            <h2 className="mt-2 text-2xl font-semibold text-slate-900">Markets we serve</h2>
-            <p className="mt-3 text-sm text-slate-700">
+            <h2 className={`mt-2 text-2xl font-semibold ${isDark ? 'text-slate-50' : 'text-slate-900'}`}>
+              Markets we serve
+            </h2>
+            <p className={`mt-3 text-sm ${isDark ? 'text-slate-200/80' : 'text-slate-700'}`}>
               Established freight and customs partners for high-demand corridors.
             </p>
             <div className="mt-6 grid gap-3">
@@ -498,13 +654,21 @@ function App() {
               ].map((route) => (
                 <div
                   key={route.region}
-                  className="flex items-center justify-between rounded-xl border border-slate-200 bg-slate-50 px-4 py-3"
+                  className={`flex items-center justify-between rounded-xl border px-4 py-3 ${
+                    isDark ? 'border-slate-800 bg-slate-900' : 'border-slate-200 bg-slate-50'
+                  }`}
                 >
                   <div>
-                    <p className="text-sm font-semibold text-slate-900">{route.region}</p>
-                    <p className="text-xs text-slate-600">{route.ports}</p>
+                    <p className={`text-sm font-semibold ${isDark ? 'text-slate-50' : 'text-slate-900'}`}>
+                      {route.region}
+                    </p>
+                    <p className={`text-xs ${isDark ? 'text-slate-300' : 'text-slate-600'}`}>{route.ports}</p>
                   </div>
-                  <span className="rounded-full bg-emerald-100 px-3 py-1 text-xs font-semibold text-emerald-800">
+                  <span
+                    className={`rounded-full px-3 py-1 text-xs font-semibold ${
+                      isDark ? 'bg-emerald-500/20 text-emerald-100' : 'bg-emerald-100 text-emerald-800'
+                    }`}
+                  >
                     Active
                   </span>
                 </div>
@@ -512,20 +676,39 @@ function App() {
             </div>
           </div>
 
-          <div className="surface rounded-2xl border border-slate-200 bg-white p-6 shadow-lg shadow-amber-100/50">
+          <div
+            className={`surface rounded-2xl border p-6 golden-shadow-lg animate-slide-in-right ${
+              isDark ? 'border-slate-800 bg-slate-900' : 'border-slate-200 bg-white'
+            }`}
+            style={{ animationDelay: '200ms' }}
+          >
             <div className="flex items-center gap-2">
               <p className="text-xs uppercase tracking-[0.2em] text-amber-200">How we work</p>
             </div>
-            <h2 className="mt-2 text-2xl font-semibold text-slate-900">From farm to your port</h2>
+            <h2 className={`mt-2 text-2xl font-semibold ${isDark ? 'text-slate-50' : 'text-slate-900'}`}>
+              From farm to your port
+            </h2>
             <div className="mt-6 grid gap-4 sm:grid-cols-2">
-              {process.map((item) => (
-                <div key={item.step} className="flex gap-3 rounded-xl border border-slate-200 bg-slate-50 p-4">
-                  <div className="flex h-9 w-9 items-center justify-center rounded-full bg-amber-100 text-sm font-semibold text-amber-800">
+              {process.map((item, idx) => (
+                <div
+                  key={item.step}
+                  className={`flex gap-3 rounded-xl border p-4 golden-shadow animate-slide-up transition-all duration-300 hover:scale-105 ${
+                    isDark ? 'border-slate-800 bg-slate-900' : 'border-slate-200 bg-slate-50'
+                  }`}
+                  style={{ animationDelay: `${300 + idx * 100}ms` }}
+                >
+                  <div
+                    className={`flex h-9 w-9 items-center justify-center rounded-full text-sm font-semibold ${
+                      isDark ? 'bg-amber-500/25 text-amber-100' : 'bg-amber-100 text-amber-800'
+                    }`}
+                  >
                     {item.step}
                   </div>
                   <div>
-                    <p className="text-sm font-semibold text-slate-900">{item.title}</p>
-                    <p className="text-xs text-slate-600">{item.text}</p>
+                    <p className={`text-sm font-semibold ${isDark ? 'text-slate-50' : 'text-slate-900'}`}>
+                      {item.title}
+                    </p>
+                    <p className={`text-xs ${isDark ? 'text-slate-300' : 'text-slate-600'}`}>{item.text}</p>
                   </div>
                 </div>
               ))}
@@ -533,21 +716,30 @@ function App() {
           </div>
         </section>
 
-        <section className="rounded-2xl border border-amber-100 bg-gradient-to-r from-amber-200/60 via-amber-100/50 to-cyan-100/50 p-6 shadow-xl shadow-amber-200/50">
+        <section
+          className={`rounded-2xl border p-6 golden-shadow-lg animate-fade-in ${
+            isDark
+              ? 'border-slate-800 bg-gradient-to-r from-slate-900/60 via-slate-800/60 to-slate-900/60'
+              : 'border-amber-100 bg-gradient-to-r from-amber-200/60 via-amber-100/50 to-cyan-100/50'
+          }`}
+          style={{ animationDelay: '400ms' }}
+        >
           <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
             <div>
               <p className="text-xs uppercase tracking-[0.2em] text-amber-900">Let’s export</p>
-              <h3 className="mt-1 text-xl font-semibold text-slate-950">
+              <h3 className={`mt-1 text-xl font-semibold ${isDark ? 'text-slate-100' : 'text-slate-950'}`}>
                 Tell us your lane, volume, and timeline — we’ll prepare samples and routing.
               </h3>
-              <p className="text-sm text-slate-800">
+              <p className={`text-sm ${isDark ? 'text-slate-200/80' : 'text-slate-800'}`}>
                 export@admastrading.com • +251 900 000 000
               </p>
             </div>
             <div className="flex flex-wrap gap-3">
               <a
                 href="mailto:export@admastrading.com"
-                className="rounded-lg bg-slate-900 px-5 py-3 text-sm font-semibold text-amber-200 shadow-lg shadow-amber-500/30 transition hover:-translate-y-0.5 hover:text-white"
+                className={`rounded-lg px-5 py-3 text-sm font-semibold shadow-lg transition hover:-translate-y-0.5 hover:text-white ${
+                  isDark ? 'bg-slate-800 text-amber-200 shadow-slate-900/50' : 'bg-slate-900 text-amber-200 shadow-amber-500/30'
+                }`}
               >
                 Email export desk
               </a>
@@ -555,7 +747,11 @@ function App() {
                 href="https://www.google.com/maps/place/Addis+Ababa,+Ethiopia"
                 target="_blank"
                 rel="noreferrer"
-                className="rounded-lg border border-slate-300 px-5 py-3 text-sm font-semibold text-slate-900 transition hover:-translate-y-0.5 hover:border-slate-900"
+                className={`rounded-lg border px-5 py-3 text-sm font-semibold transition hover:-translate-y-0.5 ${
+                  isDark
+                    ? 'border-slate-700 text-slate-100 hover:border-amber-300'
+                    : 'border-slate-300 text-slate-900 hover:border-slate-900'
+                }`}
               >
                 View origin hub
               </a>
@@ -564,8 +760,14 @@ function App() {
         </section>
       </main>
 
-      <footer className="relative border-t border-slate-200 bg-white py-6">
-        <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-3 px-4 text-sm text-slate-600">
+      <footer
+        className={`relative border-t py-6 ${isDark ? 'border-slate-800 bg-slate-900' : 'border-slate-200 bg-white'}`}
+      >
+        <div
+          className={`mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-3 px-4 text-sm ${
+            isDark ? 'text-slate-300' : 'text-slate-600'
+          }`}
+        >
           <span>© {new Date().getFullYear()} Admas Trading — Addis Ababa, Ethiopia.</span>
           <span>Fresh Injera • House spices • Reliable export logistics.</span>
         </div>

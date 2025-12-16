@@ -261,7 +261,7 @@ function App() {
         >
           <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-4 responsive-padding">
             <div className="flex items-center gap-3">
-              <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-gradient-to-br from-amber-500 to-amber-300 text-slate-950 font-semibold shadow-lg shadow-amber-500/30">
+              <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-transparent text-slate-950 font-semibold shadow-none">
                 <img src={admasLogo} alt="Admas Trading" className="h-full w-full object-cover rounded-2xl" />
               </div>
               <div>
@@ -329,7 +329,7 @@ function App() {
       >
         <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-4 responsive-padding">
           <div className="flex items-center gap-3">
-            <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-gradient-to-br from-amber-500 to-amber-300 text-slate-950 font-semibold shadow-lg shadow-amber-500/30">
+            <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-transparent text-slate-950 font-semibold shadow-none">
               <img src={admasLogo} alt="Admas Trading" className="h-full w-full object-cover rounded-2xl" />
             </div>
       <div>
@@ -340,26 +340,27 @@ function App() {
             </div>
           </div>
 
-          <nav className="flex items-center gap-3">
-            <a
-                href="#products-overview"
-                className={`btn-green rounded-full border px-3 py-2 text-sm font-semibold transition hover:-translate-y-0.5 hover:border-amber-300 ${
-                isDark ? 'border-slate-700 text-slate-100 hover:text-amber-200' : 'border-slate-200 text-slate-900 hover:text-amber-600'
-              }`}
-            >
-              Products
-            </a>
-            <a
-                href="#services"
-                className={`btn-green rounded-full border px-3 py-2 text-sm font-semibold transition hover:-translate-y-0.5 hover:border-amber-300 ${
-                isDark ? 'border-slate-700 text-slate-100 hover:text-amber-200' : 'border-slate-200 text-slate-900 hover:text-amber-600'
-              }`}
-            >
-              Services
-            </a>
-          </nav>
+          {/* nav removed from here and added to the right-side actions so links appear aligned to the right */}
 
           <div className="flex items-center gap-3">
+            <nav className="hidden sm:flex items-center gap-3">
+              <a
+                href="#products-overview"
+                className={`btn-green rounded-full border px-3 py-2 text-sm font-semibold transition hover:-translate-y-0.5 hover:border-amber-300 ${
+                  isDark ? 'border-slate-700 text-slate-100 hover:text-amber-200' : 'border-slate-200 text-slate-900 hover:text-amber-600'
+                }`}
+              >
+                Products
+              </a>
+              <a
+                href="#services"
+                className={`btn-green rounded-full border px-3 py-2 text-sm font-semibold transition hover:-translate-y-0.5 hover:border-amber-300 ${
+                  isDark ? 'border-slate-700 text-slate-100 hover:text-amber-200' : 'border-slate-200 text-slate-900 hover:text-amber-600'
+                }`}
+              >
+                Services
+              </a>
+            </nav>
             <button
               type="button"
               aria-label="Toggle dark mode"
@@ -762,15 +763,48 @@ function App() {
       </main>
 
       <footer
-        className={`relative border-t py-6 ${isDark ? 'border-slate-800 bg-slate-900' : 'border-slate-200 bg-white'}`}
+        className={`relative border-t py-12 ${isDark ? 'border-slate-800 bg-slate-900' : 'border-slate-200 bg-white'}`}
       >
         <div
-          className={`mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-3 px-4 text-sm ${
+          className={`mx-auto flex max-w-6xl flex-wrap items-start justify-start gap-3 px-4 text-sm ${
             isDark ? 'text-slate-300' : 'text-slate-600'
           }`}
         >
           <span>© {new Date().getFullYear()} Admas Trading — Addis Ababa, Ethiopia.</span>
-          <span>Fresh Injera • House spices • Reliable export logistics.</span>
+          <div className="flex items-start gap-4">
+            <div className="flex flex-col items-start gap-2">
+              <span>Fresh Injera • House spices • Reliable export logistics.</span>
+              <div className="flex items-center gap-2">
+                <a href="https://facebook.com/" target="_blank" rel="noreferrer" aria-label="Facebook" className="p-2 rounded-full transition hover:bg-slate-100/40">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M22 12c0-5.52-4.48-10-10-10S2 6.48 2 12c0 4.99 3.66 9.12 8.44 9.88v-6.99h-2.54v-2.89h2.54V9.41c0-2.51 1.49-3.89 3.77-3.89 1.09 0 2.23.2 2.23.2v2.45h-1.25c-1.23 0-1.61.77-1.61 1.56v1.87h2.74l-.44 2.89h-2.3v6.99C18.34 21.12 22 16.99 22 12z" />
+                  </svg>
+                </a>
+                <a href="https://instagram.com/" target="_blank" rel="noreferrer" aria-label="Instagram" className="p-2 rounded-full transition hover:bg-slate-100/40">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <rect x="3" y="3" width="18" height="18" rx="5" stroke="currentColor" strokeWidth="1.5" />
+                    <path d="M12 7.2a4.8 4.8 0 100 9.6 4.8 4.8 0 000-9.6z" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                    <path d="M17.8 6.2h.01" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+                  </svg>
+                </a>
+                <a href="https://www.tiktok.com/" target="_blank" rel="noreferrer" aria-label="TikTok" className="p-2 rounded-full transition hover:bg-slate-100/40">
+                  <svg className={`${isDark ? 'text-slate-300' : 'text-slate-600'}`} width="18" height="18" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M16.5 7.5c.5 0 .98.06 1.44.18v3.22a4.5 4.5 0 11-4.5-4.5V7.5h3.06z" />
+                  </svg>
+                </a>
+                <a href="https://linkedin.com/" target="_blank" rel="noreferrer" aria-label="LinkedIn" className="p-2 rounded-full transition hover:bg-slate-100/40">
+                  <svg className={`${isDark ? 'text-slate-300' : 'text-slate-600'}`} width="18" height="18" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M4 3h16a1 1 0 011 1v16a1 1 0 01-1 1H4a1 1 0 01-1-1V4a1 1 0 011-1zm4.5 14H6V9h2.5v8zM8.25 7.44a1.44 1.44 0 110-2.88 1.44 1.44 0 010 2.88zM18 17.5h-2.5v-4c0-1.1-.9-2-2-2s-2 .9-2 2v4H9V9h2.5v1.5c.69-1.04 2.12-1.5 3.5-1.5 2.21 0 4 1.79 4 4v4z" />
+                  </svg>
+                </a>
+                <a href="https://telegram.org/" target="_blank" rel="noreferrer" aria-label="Telegram" className="p-2 rounded-full transition hover:bg-slate-100/40">
+                  <svg className={`${isDark ? 'text-slate-300' : 'text-slate-600'}`} width="18" height="18" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M22 2L11 13l-3 1 1-3 11-9zM3 21l4-2 9-9 5-3-7 12-8 3-3 2z" />
+                  </svg>
+                </a>
+              </div>
+            </div>
+          </div>
         </div>
       </footer>
     </div>

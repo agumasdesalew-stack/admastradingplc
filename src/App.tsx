@@ -7,6 +7,7 @@ import mace1 from './assets/mace.jpeg'
 import mitmita from './assets/mitmita.jpeg'
 import berbere from './assets/berbere.jpeg'
 import admasLogo from './assets/admastrading.jpg'
+import Contact from './Contact'
 
 // Animated counter component
 function AnimatedCounter({ target, duration = 2000 }: { target: number; duration?: number }) {
@@ -182,7 +183,9 @@ function App() {
   }, [])
 
   useEffect(() => {
-    document.title = route.startsWith('/products') ? 'Admas Trading | Products' : 'Admas Trading | Home'
+    if (route.startsWith('/products')) document.title = 'Admas Trading | Products'
+    else if (route.startsWith('/contact')) document.title = 'Admas Trading | Contact'
+    else document.title = 'Admas Trading | Home'
   }, [route])
 
   const fullProductsGrid = useMemo(
@@ -360,6 +363,14 @@ function App() {
               >
                 Services
               </a>
+              <a
+                href="/contact"
+                className={`btn-green rounded-full border px-3 py-2 text-sm font-semibold transition hover:-translate-y-0.5 hover:border-amber-300 ${
+                  isDark ? 'border-slate-700 text-slate-100 hover:text-amber-200' : 'border-slate-200 text-slate-900 hover:text-amber-600'
+                }`}
+              >
+                Contact
+              </a>
             </nav>
             <button
               type="button"
@@ -382,7 +393,11 @@ function App() {
       </header>
 
       <main className="relative mx-auto max-w-6xl px-4 pb-16 pt-10 space-y-16">
-        <section className="grid gap-10 lg:grid-cols-[1.1fr_0.9fr] items-center">
+        {route.startsWith('/contact') ? (
+          <Contact />
+        ) : (
+          <>
+            <section className="grid gap-10 lg:grid-cols-[1.1fr_0.9fr] items-center">
           <div className="space-y-6">
             <div
               className={`inline-flex items-center gap-2 rounded-full border px-3 py-1 text-xs animate-slide-in-left ${
@@ -759,7 +774,9 @@ function App() {
               </a>
             </div>
           </div>
-        </section>
+            </section>
+          </>
+        )}
       </main>
 
       <footer
